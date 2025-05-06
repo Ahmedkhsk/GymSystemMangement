@@ -255,7 +255,7 @@ public class Login extends javax.swing.JFrame {
 
         try {
             TypedQuery<Receptionist> query = em.createQuery(
-                    "SELECT r FROM Receptionist r WHERE r.receptionistName = :name AND r.receptionistPassword = :pass",
+                    "SELECT r FROM Receptionist r WHERE r.name = :name AND r.pass = :pass",
                     Receptionist.class
             );
             query.setParameter("name", username);

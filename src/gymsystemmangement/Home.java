@@ -152,7 +152,7 @@ public class Home extends javax.swing.JFrame {
         }
         return trainees;
     }
-    
+
     public java.util.List<Trainer> getTrainers() {
         java.util.List<Trainer> trainers = new ArrayList<>();
         try {
@@ -174,7 +174,6 @@ public class Home extends javax.swing.JFrame {
         }
         return packages;
     }
-
 
     private void loadTableDataTrainee() {
         try {
@@ -260,53 +259,49 @@ public class Home extends javax.swing.JFrame {
         }
     }
 
-    private void loadTableDataEquipment() {
-        try {
+private void loadTableDataEquipment() {
+    try {
+        List<Equipment> equipmentList = em.createQuery("SELECT e FROM Equipment e", Equipment.class).getResultList();
 
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+        DefaultTableModel model = (DefaultTableModel) mytable3.getModel();
+        model.setRowCount(0);
 
-            String q = "SELECT * FROM Equipment";
-
-            PreparedStatement pst = con.prepareStatement(q);
-            ResultSet rs = pst.executeQuery();
-
-            DefaultTableModel model = (DefaultTableModel) mytable3.getModel();
-            model.setRowCount(0);
-
-            while (rs.next()) {
-                Object[] row = {
-                    rs.getInt("EquipmentID"),
-                    rs.getString("EquipmentName"),
-                    rs.getString("targetMuscle")
-                };
-                model.addRow(row);
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error loading table data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        for (Equipment e : equipmentList) {
+            Object[] row = {
+                e.getId(),
+                e.getEquipmentName(),
+                e.getTargetMuscle()
+            };
+            model.addRow(row);
         }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Error loading table data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
     }
+}
 
     private void loadTableDataReceptionist() {
         try {
 
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+            List<Receptionist> receptionists = em.createQuery("SELECT r FROM Receptionist r", Receptionist.class).getResultList();
 
-            String q = "SELECT * FROM Receptionist";
-
-            PreparedStatement pst = con.prepareStatement(q);
-            ResultSet rs = pst.executeQuery();
-
+ 
             DefaultTableModel model = (DefaultTableModel) mytable4.getModel();
             model.setRowCount(0);
 
-            while (rs.next()) {
+   
+            for (Receptionist r : receptionists) {
                 Object[] row = {
-                    rs.getInt("ReceptionistID"),
-                    rs.getString("ReceptionistName"),};
+                    r.getId(),
+                    r.getName()
+                };
                 model.addRow(row);
             }
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error loading table data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 
@@ -2406,41 +2401,41 @@ public class Home extends javax.swing.JFrame {
 
     private void jButton24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton24ActionPerformed
 
-    try {
-        String name = jTextField17.getText().trim();
-        if (!name.matches("^[a-zA-Z\\s]+$")) {
-            JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        try {
+            String name = jTextField17.getText().trim();
+            if (!name.matches("^[a-zA-Z\\s]+$")) {
+                JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        int id = Integer.parseInt(jLabel33.getText());
-        String pass = jPasswordField1.getText();
+            int id = Integer.parseInt(jLabel33.getText());
+            String pass = jPasswordField1.getText();
 
-        em.getTransaction().begin();
+            em.getTransaction().begin();
 
-        Receptionist rec = em.find(Receptionist.class, Long.valueOf(id));
-        if (rec != null) {
-            rec.setName(name);
-            rec.setPass(pass);
+            Receptionist rec = em.find(Receptionist.class, Long.valueOf(id));
+            if (rec != null) {
+                rec.setName(name);
+                rec.setPass(pass);
 
-            em.getTransaction().commit();
+                em.getTransaction().commit();
 
-            JOptionPane.showMessageDialog(null, "Receptionist updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            loadTableDataReceptionist();
-            jLabel28.setText(name);
-        } else {
+                JOptionPane.showMessageDialog(null, "Receptionist updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadTableDataReceptionist();
+                jLabel28.setText(name);
+            } else {
+                em.getTransaction().rollback();
+                JOptionPane.showMessageDialog(null, "Receptionist not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            // Reset
+            jButton25ActionPerformed(evt);
+
+        } catch (Exception e) {
             em.getTransaction().rollback();
-            JOptionPane.showMessageDialog(null, "Receptionist not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Update Error: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        // Reset
-        jButton25ActionPerformed(evt);
-
-    } catch (Exception e) {
-        em.getTransaction().rollback();
-        System.out.println("Update Error: " + e.getMessage());
-        e.printStackTrace();
-    }
     }//GEN-LAST:event_jButton24ActionPerformed
 
     private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
@@ -2450,30 +2445,30 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton25ActionPerformed
 
     private void jButton26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton26ActionPerformed
-    int id = Integer.parseInt(jLabel33.getText());
+        int id = Integer.parseInt(jLabel33.getText());
 
-    try {
-        em.getTransaction().begin();
+        try {
+            em.getTransaction().begin();
 
-        Receptionist rec = em.find(Receptionist.class, Long.valueOf(id));
-        if (rec != null) {
-            em.remove(rec);
-            em.getTransaction().commit();
+            Receptionist rec = em.find(Receptionist.class, Long.valueOf(id));
+            if (rec != null) {
+                em.remove(rec);
+                em.getTransaction().commit();
 
-            JOptionPane.showMessageDialog(null, "Receptionist deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            loadTableDataReceptionist();
-        } else {
+                JOptionPane.showMessageDialog(null, "Receptionist deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadTableDataReceptionist();
+            } else {
+                em.getTransaction().rollback();
+                JOptionPane.showMessageDialog(null, "Receptionist not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            jButton25ActionPerformed(evt);
+
+        } catch (Exception e) {
             em.getTransaction().rollback();
-            JOptionPane.showMessageDialog(null, "Receptionist not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Delete Error: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        jButton25ActionPerformed(evt);
-
-    } catch (Exception e) {
-        em.getTransaction().rollback();
-        System.out.println("Delete Error: " + e.getMessage());
-        e.printStackTrace();
-    }
     }//GEN-LAST:event_jButton26ActionPerformed
 
     private void dashbtnFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dashbtnFocusGained
@@ -2620,30 +2615,30 @@ public class Home extends javax.swing.JFrame {
     private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
 
         try {
-        int eid = Integer.parseInt(jLabel38.getText());
+            int eid = Integer.parseInt(jLabel38.getText());
 
-        em.getTransaction().begin();
-        Equipment eq = em.find(Equipment.class, Long.valueOf(eid));
+            em.getTransaction().begin();
+            Equipment eq = em.find(Equipment.class, Long.valueOf(eid));
 
-        if (eq != null) {
-            em.remove(eq);
-            em.getTransaction().commit();
-            JOptionPane.showMessageDialog(null, "Equipment deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            loadTableDataEquipment();
-        } else {
-            em.getTransaction().rollback();
-            JOptionPane.showMessageDialog(null, "Equipment not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            if (eq != null) {
+                em.remove(eq);
+                em.getTransaction().commit();
+                JOptionPane.showMessageDialog(null, "Equipment deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadTableDataEquipment();
+            } else {
+                em.getTransaction().rollback();
+                JOptionPane.showMessageDialog(null, "Equipment not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            jButton21ActionPerformed(evt);
+
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            JOptionPane.showMessageDialog(null, "An error occurred while deleting the equipment.", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
-
-        jButton21ActionPerformed(evt);
-
-    } catch (Exception e) {
-        if (em.getTransaction().isActive()) {
-            em.getTransaction().rollback();
-        }
-        JOptionPane.showMessageDialog(null, "An error occurred while deleting the equipment.", "Error", JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
-    }
     }//GEN-LAST:event_jButton22ActionPerformed
 
     private void jButton21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton21ActionPerformed
@@ -2654,58 +2649,58 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton21ActionPerformed
 
     private void jButton20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton20ActionPerformed
-     try {
-        String name = jTextField13.getText().trim();
-        String tm = jTextField16.getText().trim();
+        try {
+            String name = jTextField13.getText().trim();
+            String tm = jTextField16.getText().trim();
 
-        Equipment eq = new Equipment(name, tm);
+            Equipment eq = new Equipment(name, tm);
 
-        em.getTransaction().begin();
-        em.persist(eq);
-        em.getTransaction().commit();
+            em.getTransaction().begin();
+            em.persist(eq);
+            em.getTransaction().commit();
 
-        JOptionPane.showMessageDialog(null, "Equipment added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-        loadTableDataEquipment();
-        jButton21ActionPerformed(evt);
+            JOptionPane.showMessageDialog(null, "Equipment added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadTableDataEquipment();
+            jButton21ActionPerformed(evt);
 
-    } catch (Exception e) {
-        if (em.getTransaction().isActive()) {
-            em.getTransaction().rollback();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            JOptionPane.showMessageDialog(null, "An error occurred while adding the equipment.", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
-        JOptionPane.showMessageDialog(null, "An error occurred while adding the equipment.", "Error", JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
-    }
     }//GEN-LAST:event_jButton20ActionPerformed
 
     private void jButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton19ActionPerformed
-    String name = jTextField13.getText();
-    String tm = jTextField16.getText();
-    int id = Integer.parseInt(jLabel38.getText());
+        String name = jTextField13.getText();
+        String tm = jTextField16.getText();
+        int id = Integer.parseInt(jLabel38.getText());
 
-    try {
-        em.getTransaction().begin();
+        try {
+            em.getTransaction().begin();
 
-        Equipment eq = em.find(Equipment.class, Long.valueOf(id));
-        if (eq != null) {
-            eq.setEquipmentName(name);
-            eq.setTargetMuscle(tm);
+            Equipment eq = em.find(Equipment.class, Long.valueOf(id));
+            if (eq != null) {
+                eq.setEquipmentName(name);
+                eq.setTargetMuscle(tm);
 
-            em.getTransaction().commit();
+                em.getTransaction().commit();
 
-            JOptionPane.showMessageDialog(null, "Equipment updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            loadTableDataEquipment();
-        } else {
+                JOptionPane.showMessageDialog(null, "Equipment updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadTableDataEquipment();
+            } else {
+                em.getTransaction().rollback();
+                JOptionPane.showMessageDialog(null, "Equipment not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            jButton21ActionPerformed(evt);
+
+        } catch (Exception e) {
             em.getTransaction().rollback();
-            JOptionPane.showMessageDialog(null, "Equipment not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Update Error: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        jButton21ActionPerformed(evt);
-
-    } catch (Exception e) {
-        em.getTransaction().rollback();
-        System.out.println("Update Error: " + e.getMessage());
-        e.printStackTrace();
-    }
     }//GEN-LAST:event_jButton19ActionPerformed
 
     private void mytable3AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_mytable3AncestorAdded
