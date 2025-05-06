@@ -1470,6 +1470,11 @@ public class Home extends javax.swing.JFrame {
         jLabel17.setText("Equipment Name");
 
         jTextField13.setBackground(new java.awt.Color(238, 238, 238));
+        jTextField13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField13ActionPerformed(evt);
+            }
+        });
 
         jTextField16.setBackground(new java.awt.Color(238, 238, 238));
 
@@ -2401,39 +2406,41 @@ public class Home extends javax.swing.JFrame {
 
     private void jButton24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton24ActionPerformed
 
-        try {
-            String name = jTextField17.getText().trim();
-            if (!name.matches("^[a-zA-Z\\s]+$")) {
-                JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            int id = Integer.parseInt(jLabel33.getText());
-            String pass = jPasswordField1.getText();
-
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
-            String q = "UPDATE Receptionist "
-                    + "set ReceptionistName = (?),ReceptionistPassword = (?) where ReceptionistID = (?)";
-            PreparedStatement pst = con.prepareStatement(q);
-
-            pst.setString(1, name);
-            pst.setString(2, pass);
-            pst.setInt(3, id);
-
-            int rowsInserted = pst.executeUpdate();
-
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Receptionist Update successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadTableDataReceptionist();
-                jLabel28.setText(name);
-            } else {
-                JOptionPane.showMessageDialog(null, "Receptionist to Update Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-
-            //Reset
-            jButton25ActionPerformed(evt);
-        } catch (Exception e) {
-            System.out.println(e);
+    try {
+        String name = jTextField17.getText().trim();
+        if (!name.matches("^[a-zA-Z\\s]+$")) {
+            JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+
+        int id = Integer.parseInt(jLabel33.getText());
+        String pass = jPasswordField1.getText();
+
+        em.getTransaction().begin();
+
+        Receptionist rec = em.find(Receptionist.class, Long.valueOf(id));
+        if (rec != null) {
+            rec.setName(name);
+            rec.setPass(pass);
+
+            em.getTransaction().commit();
+
+            JOptionPane.showMessageDialog(null, "Receptionist updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadTableDataReceptionist();
+            jLabel28.setText(name);
+        } else {
+            em.getTransaction().rollback();
+            JOptionPane.showMessageDialog(null, "Receptionist not found.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        // Reset
+        jButton25ActionPerformed(evt);
+
+    } catch (Exception e) {
+        em.getTransaction().rollback();
+        System.out.println("Update Error: " + e.getMessage());
+        e.printStackTrace();
+    }
     }//GEN-LAST:event_jButton24ActionPerformed
 
     private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
@@ -2443,26 +2450,30 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton25ActionPerformed
 
     private void jButton26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton26ActionPerformed
-        int id = Integer.parseInt(jLabel33.getText());
-        try {
+    int id = Integer.parseInt(jLabel33.getText());
 
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+    try {
+        em.getTransaction().begin();
 
-            String q = "Delete from Receptionist where ReceptionistID = (?)";
-            PreparedStatement pst = con.prepareStatement(q);
-            pst.setInt(1, id);
-            int rowsInserted = pst.executeUpdate();
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Receptionist Deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadTableDataReceptionist();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to Delete Receptionist.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+        Receptionist rec = em.find(Receptionist.class, Long.valueOf(id));
+        if (rec != null) {
+            em.remove(rec);
+            em.getTransaction().commit();
 
-            jButton25ActionPerformed(evt);
-        } catch (Exception e) {
-            System.out.println(e);
+            JOptionPane.showMessageDialog(null, "Receptionist deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadTableDataReceptionist();
+        } else {
+            em.getTransaction().rollback();
+            JOptionPane.showMessageDialog(null, "Receptionist not found.", "Error", JOptionPane.ERROR_MESSAGE);
         }
+
+        jButton25ActionPerformed(evt);
+
+    } catch (Exception e) {
+        em.getTransaction().rollback();
+        System.out.println("Delete Error: " + e.getMessage());
+        e.printStackTrace();
+    }
     }//GEN-LAST:event_jButton26ActionPerformed
 
     private void dashbtnFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dashbtnFocusGained
@@ -2607,25 +2618,32 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField9ActionPerformed
 
     private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
-        int eid = Integer.parseInt(jLabel38.getText());
+
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+        int eid = Integer.parseInt(jLabel38.getText());
 
-            String q = "Delete from Equipment where EquipmentID = (?)";
-            PreparedStatement pst = con.prepareStatement(q);
-            pst.setInt(1, eid);
-            int rowsInserted = pst.executeUpdate();
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Equipment Deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadTableDataEquipment();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to Delete Equipment.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+        em.getTransaction().begin();
+        Equipment eq = em.find(Equipment.class, Long.valueOf(eid));
 
-            jButton21ActionPerformed(evt);
-        } catch (Exception e) {
-            System.out.println(e);
+        if (eq != null) {
+            em.remove(eq);
+            em.getTransaction().commit();
+            JOptionPane.showMessageDialog(null, "Equipment deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadTableDataEquipment();
+        } else {
+            em.getTransaction().rollback();
+            JOptionPane.showMessageDialog(null, "Equipment not found.", "Error", JOptionPane.ERROR_MESSAGE);
         }
+
+        jButton21ActionPerformed(evt);
+
+    } catch (Exception e) {
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
+        }
+        JOptionPane.showMessageDialog(null, "An error occurred while deleting the equipment.", "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
     }//GEN-LAST:event_jButton22ActionPerformed
 
     private void jButton21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton21ActionPerformed
@@ -2636,59 +2654,58 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton21ActionPerformed
 
     private void jButton20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton20ActionPerformed
-        String name = jTextField13.getText();
-        String tm = jTextField16.getText();
+     try {
+        String name = jTextField13.getText().trim();
+        String tm = jTextField16.getText().trim();
 
-        try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+        Equipment eq = new Equipment(name, tm);
 
-            String q = "INSERT INTO Equipment (EquipmentName,targetMuscle) VALUES (?,?)";
-            PreparedStatement pst = con.prepareStatement(q);
+        em.getTransaction().begin();
+        em.persist(eq);
+        em.getTransaction().commit();
 
-            pst.setString(1, name);
-            pst.setString(2, tm);
+        JOptionPane.showMessageDialog(null, "Equipment added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        loadTableDataEquipment();
+        jButton21ActionPerformed(evt);
 
-            int rowsInserted = pst.executeUpdate();
-
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Equipment added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadTableDataEquipment();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to add Equipment.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-            jButton21ActionPerformed(evt);
-        } catch (Exception e) {
-            System.out.println(e);
+    } catch (Exception e) {
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
         }
+        JOptionPane.showMessageDialog(null, "An error occurred while adding the equipment.", "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
     }//GEN-LAST:event_jButton20ActionPerformed
 
     private void jButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton19ActionPerformed
-        String name = jTextField13.getText();
-        String tm = jTextField16.getText();
-        int id = Integer.parseInt(jLabel38.getText());
-        try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+    String name = jTextField13.getText();
+    String tm = jTextField16.getText();
+    int id = Integer.parseInt(jLabel38.getText());
 
-            String q = "UPDATE Equipment "
-                    + "set EquipmentName = (?),targetMuscle = (?) where EquipmentID = (?)";
+    try {
+        em.getTransaction().begin();
 
-            PreparedStatement pst = con.prepareStatement(q);
+        Equipment eq = em.find(Equipment.class, Long.valueOf(id));
+        if (eq != null) {
+            eq.setEquipmentName(name);
+            eq.setTargetMuscle(tm);
 
-            pst.setString(1, name);
-            pst.setString(2, tm);
-            pst.setInt(3, id);
-            int rowsInserted = pst.executeUpdate();
+            em.getTransaction().commit();
 
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Equipment Update successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadTableDataEquipment();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to Update Equipment.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-            jButton21ActionPerformed(evt);
-        } catch (Exception e) {
-            System.out.println(e);
+            JOptionPane.showMessageDialog(null, "Equipment updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadTableDataEquipment();
+        } else {
+            em.getTransaction().rollback();
+            JOptionPane.showMessageDialog(null, "Equipment not found.", "Error", JOptionPane.ERROR_MESSAGE);
         }
+
+        jButton21ActionPerformed(evt);
+
+    } catch (Exception e) {
+        em.getTransaction().rollback();
+        System.out.println("Update Error: " + e.getMessage());
+        e.printStackTrace();
+    }
     }//GEN-LAST:event_jButton19ActionPerformed
 
     private void mytable3AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_mytable3AncestorAdded
@@ -2708,6 +2725,10 @@ public class Home extends javax.swing.JFrame {
 
         }
     }//GEN-LAST:event_mytable3MouseClicked
+
+    private void jTextField13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField13ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField13ActionPerformed
 
     public static void main(String args[]) {
 
