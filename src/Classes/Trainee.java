@@ -7,11 +7,13 @@ public class Trainee extends Person {
     private String goal;
     private String startDate;
     private String endDate;
+    
     //Relationship
     private int PID;
     private int TID;
     
     public Trainee(){ }
+    
     public Trainee(int id ,String name, int age, String phone , float weight, float height, String goal, String startDate, String endDate, int PID, int TID) {
         super(name, age, phone);
         this.weight = weight;
