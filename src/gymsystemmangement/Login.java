@@ -1,13 +1,20 @@
 package gymsystemmangement;
 
 import java.awt.*;
-import java.sql.*;
+import ODB.*;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import javax.swing.*;
 
 public class Login extends javax.swing.JFrame {
 
+    EntityManager em;
+
     public Login() {
         initComponents();
+        em = Persistence.createEntityManagerFactory("GymSystemMangementPU").createEntityManager();
         ImageIcon imageIcon = new ImageIcon("mainlogo.png");
         this.setIconImage(imageIcon.getImage());
         this.setLocationRelativeTo(null);
@@ -247,33 +254,31 @@ public class Login extends javax.swing.JFrame {
         String password = pass.getText();
 
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+            TypedQuery<Receptionist> query = em.createQuery(
+                    "SELECT r FROM Receptionist r WHERE r.receptionistName = :name AND r.receptionistPassword = :pass",
+                    Receptionist.class
+            );
+            query.setParameter("name", username);
+            query.setParameter("pass", password);
 
-            Statement st = con.createStatement();
-            String q = "select ReceptionistName , ReceptionistPassword from Receptionist";
+            Receptionist receptionist = query.getSingleResult();
 
-            ResultSet rs = st.executeQuery(q);
+            jLabel4.setVisible(false);
+            JOptionPane.showMessageDialog(null, "Login successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            new Home(username).setVisible(true);
+            this.dispose();
 
-            while (rs.next()) {
+        } catch (NoResultException e) {
 
-                String us = rs.getString("ReceptionistName");
-                String ps = rs.getString("ReceptionistPassword");
-
-                if (username.equals(us) && password.equals(ps)) {
-                    jLabel4.setVisible(false);
-                    JOptionPane.showMessageDialog(null, "Login successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    new Home(username).setVisible(true);
-                    this.dispose();
-                } else {
-                    jLabel4.setVisible(true);
-                    uname.setText("");
-                    pass.setText("");
-                }
-            }
-
+            jLabel4.setVisible(true);
+            uname.setText("");
+            pass.setText("");
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Login Error: " + e.getMessage());
+            e.printStackTrace();
         }
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void unameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unameActionPerformed
