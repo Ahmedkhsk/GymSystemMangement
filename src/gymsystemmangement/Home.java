@@ -1,19 +1,29 @@
 package gymsystemmangement;
 
-import Classes.*;
-import java.awt.*;
-import java.sql.*;
-import java.text.*;
-import java.util.*;
+import ODB.*;
 import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import javax.swing.table.*;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
+import java.sql.*;
 
 public class Home extends javax.swing.JFrame {
 
+    EntityManager em;
+
     public Home() {
 
-        initComponents();   
+        initComponents();
+
+        em = Persistence.createEntityManagerFactory("GymSystemMangementPU").createEntityManager();
+
         this.setSize(1250, 700);
         ImageIcon imageIcon = new ImageIcon("mainlogo.png");
         this.setIconImage(imageIcon.getImage());
@@ -38,7 +48,7 @@ public class Home extends javax.swing.JFrame {
         MenuPanel.setSelectedIndex(3);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        
+
         jLabel28.setText("Ahmed Khaled");
 
         DefaultTableCellRenderer def = new DefaultTableCellHeaderRenderer();
@@ -60,7 +70,11 @@ public class Home extends javax.swing.JFrame {
     }
 
     public Home(String use) {
+
         initComponents();
+
+        em = Persistence.createEntityManagerFactory("GymSystemMangementPU").createEntityManager();
+
         this.setSize(1250, 700);
         ImageIcon imageIcon = new ImageIcon("mainlogo.png");
         this.setIconImage(imageIcon.getImage());
@@ -112,7 +126,7 @@ public class Home extends javax.swing.JFrame {
 
     public void LoadTrainersComboBox() {
         jComboBox4.removeAllItems();
-        ArrayList<Trainer> trainers = getTrainers();
+        List<Trainer> trainers = getTrainers();
         jComboBox4.addItem("Select Trainer");
         for (Trainer t : trainers) {
             jComboBox4.addItem(t.getName());
@@ -121,132 +135,77 @@ public class Home extends javax.swing.JFrame {
 
     public void LoadPackagesComboBox() {
         jComboBox3.removeAllItems();
-        ArrayList<Classes.Package> packages = getPackages();
+        List<ODB.Package> packages = getPackages();
         jComboBox3.addItem("Select Package");
-        for (Classes.Package t : packages) {
+        for (ODB.Package t : packages) {
             jComboBox3.addItem(t.getType());
         }
     }
 
-    public ArrayList<Trainee> getTrainees() {
-        ArrayList<Trainee> trainees = new ArrayList<>();
+    public java.util.List<Trainee> getTrainees() {
+        java.util.List<Trainee> trainees = new ArrayList<>();
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
-
-            Statement st = con.createStatement();
-            String q = "select * from Trainee";
-            ResultSet rs = st.executeQuery(q);
-
-            while (rs.next()) {
-                int id = rs.getInt("TraineeID");
-                String name = rs.getString("name");
-                int age = rs.getInt("age");
-                String phone = rs.getString("phone");
-                float weight = rs.getFloat("weight");
-                float height = rs.getFloat("height");
-                String goal = rs.getString("goal");
-                String startDate = rs.getString("startDate");
-                String endDate = rs.getString("endDate");
-                int PackageID = rs.getInt("PackageID");
-                int TrainerID = rs.getInt("TrainerID");
-
-                Trainee tr = new Trainee(id, name, age, phone, weight, height, goal, startDate, endDate, PackageID, TrainerID);
-                trainees.add(tr);
-            }
+            trainees = em.createQuery("SELECT t FROM Trainee t", Trainee.class).getResultList();
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Error fetching trainees: " + e.getMessage());
+            e.printStackTrace();
         }
         return trainees;
     }
-
-    public ArrayList<Trainer> getTrainers() {
-        ArrayList<Trainer> trainers = new ArrayList<>();
+    
+    public java.util.List<Trainer> getTrainers() {
+        java.util.List<Trainer> trainers = new ArrayList<>();
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
-
-            Statement st = con.createStatement();
-            String q = "select * from Trainer";
-            ResultSet rs = st.executeQuery(q);
-
-            while (rs.next()) {
-                int id = rs.getInt("TrainerID");
-                String name = rs.getString("name");
-                int age = rs.getInt("age");
-                String phone = rs.getString("phone");
-                float salary = rs.getFloat("salary");
-                String speciality = rs.getString("speciality");
-
-                Trainer tr = new Trainer(id, name, age, phone, salary, speciality);
-                trainers.add(tr);
-            }
+            trainers = em.createQuery("SELECT t FROM Trainer t", Trainer.class).getResultList();
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Error fetching trainers: " + e.getMessage());
+            e.printStackTrace();
         }
         return trainers;
     }
 
-    public ArrayList<Classes.Package> getPackages() {
-        ArrayList<Classes.Package> packages = new ArrayList<>();
+    public List<ODB.Package> getPackages() {
+        List<ODB.Package> packages = new ArrayList<>();
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
-
-            Statement st = con.createStatement();
-            
-            String q = "select * from Package";
-            ResultSet rs = st.executeQuery(q);
-
-            while (rs.next()) {
-                int id = rs.getInt("PackageID");
-                String type = rs.getString("Type");
-                int Duration = rs.getInt("Duration");
-                float packageFee = rs.getFloat("packageFee");
-
-                Classes.Package pa = new Classes.Package(id, type, Duration, packageFee);
-                packages.add(pa);
-            }
+            packages = em.createQuery("SELECT p FROM Package p", ODB.Package.class).getResultList();
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Error fetching packages: " + e.getMessage());
+            e.printStackTrace();
         }
         return packages;
     }
 
+
     private void loadTableDataTrainee() {
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
-
-            String q = "SELECT Trainee.TraineeID, Trainee.name, Trainee.age, Trainee.phone, Trainee.goal, Trainee.weight, Trainee.height, "
-                    + "Trainee.startDate, Trainee.endDate, Package.Type AS packageName, Trainer.name AS trainerName "
-                    + "FROM Trainee "
-                    + "JOIN Package ON Trainee.PackageID = Package.PackageID "
-                    + "JOIN Trainer ON Trainee.TrainerID = Trainer.TrainerID";
-
-            PreparedStatement pst = con.prepareStatement(q);
-            ResultSet rs = pst.executeQuery();
-
             DefaultTableModel model = (DefaultTableModel) mytable1.getModel();
             model.setRowCount(0);
 
-            while (rs.next()) {
+            List<Trainee> trainees = em.createQuery("SELECT t FROM Trainee t", Trainee.class).getResultList();
+
+            for (Trainee t : trainees) {
                 Object[] row = {
-                    rs.getInt("TraineeID"),
-                    rs.getString("name"),
-                    rs.getInt("age"),
-                    rs.getString("phone"),
-                    rs.getString("goal"),
-                    rs.getFloat("weight"),
-                    rs.getFloat("height"),
-                    rs.getString("trainerName"),
-                    rs.getString("packageName"),
-                    rs.getString("startDate"),
-                    rs.getString("endDate")
+                    t.getId(),
+                    t.getName(),
+                    t.getAge(),
+                    t.getPhone(),
+                    t.getGoal(),
+                    t.getWeight(),
+                    t.getHeight(),
+                    t.getTrainee().getName(),
+                    t.getPacka().getType(),
+                    t.getStartDate(),
+                    t.getEndDate()
                 };
                 model.addRow(row);
             }
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error loading table data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
-    
+
     private void loadTableDataTrainer() {
         try {
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
@@ -303,7 +262,7 @@ public class Home extends javax.swing.JFrame {
 
     private void loadTableDataEquipment() {
         try {
-            
+
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
 
             String q = "SELECT * FROM Equipment";
@@ -329,7 +288,7 @@ public class Home extends javax.swing.JFrame {
 
     private void loadTableDataReceptionist() {
         try {
-            
+
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
 
             String q = "SELECT * FROM Receptionist";
@@ -366,20 +325,13 @@ public class Home extends javax.swing.JFrame {
     }
 
     public int countTrainee() {
-        int count = 0;
-        ArrayList<Trainee> trs = getTrainees();
-
-        count = trs.size();
-        return count;
+        java.util.List<Trainee> trs = getTrainees();
+        return trs.size();
     }
 
     public int countTrainer() {
-        int count = 0;
-
-        ArrayList<Trainer> trs = getTrainers();
-        count = trs.size();
-
-        return count;
+        java.util.List<Trainer> trs = getTrainers();
+        return trs.size();
     }
 
     @SuppressWarnings("unchecked")
@@ -1088,7 +1040,7 @@ public class Home extends javax.swing.JFrame {
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addContainerGap(207, Short.MAX_VALUE))
+                        .addContainerGap(94, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel39)
                         .addGap(0, 0, Short.MAX_VALUE))))
@@ -1120,31 +1072,32 @@ public class Home extends javax.swing.JFrame {
                         .addComponent(jLabel18)
                         .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGap(63, 63, 63)
                                 .addComponent(jLabel15)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel39)))
-                        .addGap(50, 50, 50))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jButton13, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jButton11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(17, 17, 17)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addComponent(jLabel39)
+                                .addGap(50, 50, 50))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jButton13, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jButton11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(17, 17, 17)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30)))
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(49, 49, 49))
         );
@@ -1639,10 +1592,10 @@ public class Home extends javax.swing.JFrame {
             }
         ));
         mytable3.addAncestorListener(new javax.swing.event.AncestorListener() {
-            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
-            }
             public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
                 mytable3AncestorAdded(evt);
+            }
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
             }
             public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
             }
@@ -1895,39 +1848,39 @@ public class Home extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
         try {
-        String name = jTextField2.getText().trim();
-        if (!name.matches("^[a-zA-Z\\s]+$")) {
-            JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        int age;
-        try {
-            age = Integer.parseInt(jTextField1.getText());
-            if (age <= 0) {
-                JOptionPane.showMessageDialog(null, "Age Must be More Than 0", "Error", JOptionPane.ERROR_MESSAGE);
+            String name = jTextField2.getText().trim();
+            if (!name.matches("^[a-zA-Z\\s]+$")) {
+                JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Invalid Age Input", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
 
-        float salary;
-        try {
-            salary = Float.parseFloat(jTextField4.getText());
-            if (salary <= 0) {
-                JOptionPane.showMessageDialog(null, "Salary Must be More Than 0", "Error", JOptionPane.ERROR_MESSAGE);
+            int age;
+            try {
+                age = Integer.parseInt(jTextField1.getText());
+                if (age <= 0) {
+                    JOptionPane.showMessageDialog(null, "Age Must be More Than 0", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Invalid Age Input", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Invalid Salary Input", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
 
-        String phone = jTextField3.getText();
-        String speciality = jComboBox2.getSelectedItem().toString();
-        
+            float salary;
+            try {
+                salary = Float.parseFloat(jTextField4.getText());
+                if (salary <= 0) {
+                    JOptionPane.showMessageDialog(null, "Salary Must be More Than 0", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Invalid Salary Input", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String phone = jTextField3.getText();
+            String speciality = jComboBox2.getSelectedItem().toString();
+
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
 
             String q = "INSERT INTO Trainer (name,age,phone,salary,speciality) VALUES (?,?,?,?,?)";
@@ -2057,6 +2010,7 @@ public class Home extends javax.swing.JFrame {
 
         try {
             int id = Integer.parseInt(jLabel39.getText());
+
             String name = jTextField5.getText().trim();
             if (!name.matches("^[a-zA-Z\\s]+$")) {
                 JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
@@ -2095,45 +2049,48 @@ public class Home extends javax.swing.JFrame {
                     return;
                 }
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Height Weight Input", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Invalid Height Input", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
             String phone = jTextField7.getText();
             String goal = jTextArea2.getText();
             int PID = jComboBox3.getSelectedIndex();
             int TID = jComboBox4.getSelectedIndex();
 
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+            em.getTransaction().begin();
 
-            String q = "UPDATE Trainee "
-                    + "set name = (?),age = (?),phone = (?),weight = (?),height = (?)"
-                    + ",goal = (?),PackageID = (?),TrainerID = (?) "
-                    + "where TraineeID = (?)";
-
-            PreparedStatement pst = con.prepareStatement(q);
-
-            pst.setString(1, name);
-            pst.setInt(2, age);
-            pst.setString(3, phone);
-            pst.setFloat(4, weight);
-            pst.setFloat(5, height);
-            pst.setString(6, goal);
-            pst.setInt(7, PID);
-            pst.setInt(8, TID);
-            pst.setInt(9, id);
-
-            int rowsInserted = pst.executeUpdate();
-
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Trainee Update successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadTableDataTrainee();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to Update Trainee.", "Error", JOptionPane.ERROR_MESSAGE);
+            Trainee trainee = em.find(Trainee.class, id);
+            if (trainee == null) {
+                JOptionPane.showMessageDialog(null, "Trainee not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                em.getTransaction().rollback();
+                return;
             }
+
+            trainee.setName(name);
+            trainee.setAge(age);
+            trainee.setPhone(phone);
+            trainee.setWeight(weight);
+            trainee.setHeight(height);
+            trainee.setGoal(goal);
+
+            Trainer trainer = em.find(Trainer.class, TID);
+            ODB.Package packa = em.find(ODB.Package.class, PID);
+
+            trainee.setTrainee(trainer);
+            trainee.setPacka(packa);
+
+            em.merge(trainee);
+            em.getTransaction().commit();
+
+            JOptionPane.showMessageDialog(null, "Trainee updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadTableDataTrainee();
             jButton12ActionPerformed(evt);
 
         } catch (Exception e) {
-            System.out.println(e);
+            em.getTransaction().rollback();
+            System.out.println("Update Error: " + e.getMessage());
+            e.printStackTrace();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -2183,20 +2140,23 @@ public class Home extends javax.swing.JFrame {
 
         String phone = jTextField7.getText();
         String goal = jTextArea2.getText();
-        
+
         int PID = jComboBox3.getSelectedIndex();
         int TID = jComboBox4.getSelectedIndex();
 
         Calendar startDate = Calendar.getInstance();
         Calendar endDate = Calendar.getInstance();
-        
-        ArrayList<Classes.Package> packages = getPackages();
-        
-        for (Classes.Package t : packages) 
-            if (t.getId() == PID) 
-                endDate.add(Calendar.MONTH, t.getDuration());
-        
-        
+
+        ODB.Package selectedPackage = em.find(ODB.Package.class, PID);
+        ODB.Trainer selectedTrainer = em.find(ODB.Trainer.class, TID);
+
+        if (selectedPackage == null || selectedTrainer == null) {
+            JOptionPane.showMessageDialog(null, "Invalid Package or Trainer selection.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        endDate.add(Calendar.MONTH, selectedPackage.getDuration());
+
         String st;
         String ed;
 
@@ -2205,36 +2165,37 @@ public class Home extends javax.swing.JFrame {
         ed = sdf.format(endDate.getTime());
 
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
 
-            String q = "INSERT INTO Trainee(name,age,phone,weight,height,goal,startDate,endDate,PackageID,TrainerID) VALUES (?,?,?,?,?,?,?,?,?,?)";
-            PreparedStatement pst = con.prepareStatement(q);
+            Trainee newTrainee = new Trainee(
+                    name,
+                    age,
+                    phone,
+                    weight,
+                    height,
+                    goal,
+                    st,
+                    ed,
+                    selectedTrainer,
+                    selectedPackage
+            );
 
-            pst.setString(1, name);
-            pst.setInt(2, age);
-            pst.setString(3, phone);
-            pst.setFloat(4, weight);
-            pst.setFloat(5, height);
-            pst.setString(6, goal);
-            pst.setString(7, st);
-            pst.setString(8, ed);
-            pst.setInt(9, PID);
-            pst.setInt(10, TID);
+            em.getTransaction().begin();
+            em.persist(newTrainee);
+            em.getTransaction().commit();
 
-            int rowsInserted = pst.executeUpdate();
-
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Trainee added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                
-                loadTableDataTrainee();
-                loadDashBord();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to add Trainee.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+            JOptionPane.showMessageDialog(null, "Trainee added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadTableDataTrainee();
+            loadDashBord();
             jButton12ActionPerformed(evt);
+
         } catch (Exception e) {
-            System.out.println(e);
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            JOptionPane.showMessageDialog(null, "Failed to add Trainee: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
+
     }//GEN-LAST:event_jButton11ActionPerformed
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
@@ -2252,22 +2213,26 @@ public class Home extends javax.swing.JFrame {
     private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
         int tid = Integer.parseInt(jLabel39.getText());
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
-            String q = "Delete from Trainee where TraineeID = (?)";
-            PreparedStatement pst = con.prepareStatement(q);
-            pst.setInt(1, tid);
-            int rowsInserted = pst.executeUpdate();
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Trainee Deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            em.getTransaction().begin();
+
+            Trainee trainee = em.find(Trainee.class, tid);
+            if (trainee != null) {
+                em.remove(trainee);
+                em.getTransaction().commit();
+
+                JOptionPane.showMessageDialog(null, "Trainee deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 loadTableDataTrainee();
                 loadDashBord();
+                jButton12ActionPerformed(evt);
             } else {
-                JOptionPane.showMessageDialog(null, "Failed to Delete Trainee.", "Error", JOptionPane.ERROR_MESSAGE);
+                em.getTransaction().rollback();
+                JOptionPane.showMessageDialog(null, "Trainee not found.", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
-            jButton12ActionPerformed(evt);
         } catch (Exception e) {
-            System.out.println(e);
+            em.getTransaction().rollback();
+            System.out.println("Delete Error: " + e.getMessage());
+            e.printStackTrace();
         }
     }//GEN-LAST:event_jButton13ActionPerformed
 
@@ -2290,7 +2255,7 @@ public class Home extends javax.swing.JFrame {
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
 
         try {
-                String type = jTextField11.getText().trim();
+            String type = jTextField11.getText().trim();
             if (!type.matches("^[a-zA-Z\\s]+$")) {
                 JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -2319,7 +2284,7 @@ public class Home extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Invalid packageFee Input", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-    
+
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
 
             String q = "INSERT INTO Package (Type,Duration,packageFee) VALUES (?,?,?)";
@@ -2347,8 +2312,8 @@ public class Home extends javax.swing.JFrame {
     private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
 
         try {
-        int id = Integer.parseInt(jLabel41.getText());
-        String type = jTextField11.getText().trim();
+            int id = Integer.parseInt(jLabel41.getText());
+            String type = jTextField11.getText().trim();
             if (!type.matches("^[a-zA-Z\\s]+$")) {
                 JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -2377,7 +2342,7 @@ public class Home extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Invalid packageFee Input", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
+
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
 
             String q = "UPDATE Package "
@@ -2435,7 +2400,7 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton18ActionPerformed
 
     private void jButton24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton24ActionPerformed
-        
+
         try {
             String name = jTextField17.getText().trim();
             if (!name.matches("^[a-zA-Z\\s]+$")) {
@@ -2444,7 +2409,7 @@ public class Home extends javax.swing.JFrame {
             }
             int id = Integer.parseInt(jLabel33.getText());
             String pass = jPasswordField1.getText();
-        
+
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
             String q = "UPDATE Receptionist "
                     + "set ReceptionistName = (?),ReceptionistPassword = (?) where ReceptionistID = (?)";
@@ -2480,7 +2445,7 @@ public class Home extends javax.swing.JFrame {
     private void jButton26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton26ActionPerformed
         int id = Integer.parseInt(jLabel33.getText());
         try {
-            
+
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
 
             String q = "Delete from Receptionist where ReceptionistID = (?)";
@@ -2594,11 +2559,12 @@ public class Home extends javax.swing.JFrame {
     private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
         try {
             int PID = Integer.parseInt(jLabel39.getText());
+
             Calendar startDate = Calendar.getInstance();
             Calendar endDate = Calendar.getInstance();
 
-            ArrayList<Classes.Package> packages = getPackages();
-            for (Classes.Package t : packages) {
+            List<ODB.Package> packages = getPackages();
+            for (ODB.Package t : packages) {
                 if (t.getId() == PID) {
                     endDate.add(Calendar.MONTH, t.getDuration());
                 }
@@ -2611,32 +2577,29 @@ public class Home extends javax.swing.JFrame {
             st = sdf.format(startDate.getTime());
             ed = sdf.format(endDate.getTime());
 
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+            em.getTransaction().begin();
 
-            String q = "UPDATE Trainee "
-                    + "set startDate = (?) , endDate = (?)"
-                    + "where TraineeID = (?)";
+            Trainee trainee = em.find(Trainee.class, PID);
+            if (trainee != null) {
+                trainee.setStartDate(st);
+                trainee.setEndDate(ed);
 
-            PreparedStatement pst = con.prepareStatement(q);
+                em.merge(trainee);
+                em.getTransaction().commit();
 
-            pst.setString(1, st);
-            pst.setString(2, ed);
-            pst.setInt(3, PID);
-
-            int rowsInserted = pst.executeUpdate();
-
-            if (rowsInserted > 0) {
                 JOptionPane.showMessageDialog(null, "Subscription Renewed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 loadTableDataTrainee();
             } else {
-                JOptionPane.showMessageDialog(null, "Failed to Update Subscription.", "Error", JOptionPane.ERROR_MESSAGE);
+                em.getTransaction().rollback();
+                JOptionPane.showMessageDialog(null, "Trainee not found.", "Error", JOptionPane.ERROR_MESSAGE);
             }
             jButton12ActionPerformed(evt);
 
         } catch (Exception e) {
-            System.out.println(e);
+            em.getTransaction().rollback();
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
         }
-
     }//GEN-LAST:event_jButton15ActionPerformed
 
     private void jTextField9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField9ActionPerformed

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ODB;
 
 import java.util.List;
@@ -12,10 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-/**
- *
- * @author lenovo
- */
 @Entity
 public class Trainer extends Person  implements Serializable {
  
@@ -37,33 +29,39 @@ public class Trainer extends Person  implements Serializable {
         this.speciality = speciality;
     }
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
-
     public Long getId() {
         return id;
-    }
-
-    public float getSalary() {
-        return salary;
-    }
-
-    public String getSpeciality() {
-        return speciality;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
+    public float getSalary() {
+        return salary;
+    }
+
     public void setSalary(float salary) {
         this.salary = salary;
+    }
+
+    public String getSpeciality() {
+        return speciality;
     }
 
     public void setSpeciality(String speciality) {
         this.speciality = speciality;
     }
+
+    public List<Trainee> getTraineeList() {
+        return traineeList;
+    }
+
+    public void setTraineeList(List<Trainee> traineeList) {
+        this.traineeList = traineeList;
+    }
+
+    
 
     @Override
     public String toString() {

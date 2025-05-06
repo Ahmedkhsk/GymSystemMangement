@@ -22,22 +22,20 @@ public class Trainee extends Person implements Serializable {
     private String endDate;
 
     @ManyToOne
-    Trainer trainee;
+    Trainer trainer;
     
     @ManyToOne
     Package packa;
     
     public Trainee(){}
-    
-    
-    public Trainee(String name, int age, String phone, float weight, float height, String goal,String startDate,String endDate,Trainer trainee,Package packa) {
+    public Trainee(String name, int age, String phone, float weight, float height, String goal,String startDate,String endDate,Trainer trainer,Package packa) {
         super(name, age, phone);
         this.weight = weight;
         this.height = height;
         this.goal = goal;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.trainee = trainee;
+        this.trainer = trainer;
         this.packa = packa;
     }
 
@@ -54,11 +52,11 @@ public class Trainee extends Person implements Serializable {
     }
 
     public Trainer getTrainee() {
-        return trainee;
+        return trainer;
     }
 
-    public void setTrainee(Trainer trainee) {
-        this.trainee = trainee;
+    public void setTrainee(Trainer trainer) {
+        this.trainer = trainer;
     }
     
     public Long getId() {
@@ -111,6 +109,8 @@ public class Trainee extends Person implements Serializable {
 
     @Override
     public String toString() {
-        return "Trainee{" + "id=" + id + ", weight=" + weight + ", height=" + height + ", goal=" + goal + ", startDate=" + startDate + ", endDate=" + endDate + '}';
+        return "Trainee{" + "id=" + id + ", weight=" + weight + ", height=" + height + ", goal=" + goal + ", startDate=" + startDate + ", endDate=" + endDate + ", trainer=" + trainer + ", packa=" + packa + '}';
     }
+
+
 }

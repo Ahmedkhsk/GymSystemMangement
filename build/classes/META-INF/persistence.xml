@@ -5,6 +5,8 @@
     <class>ODB.Trainee</class>
     <class>ODB.Trainer</class>
     <class>ODB.Package</class>
+    <class>ODB.Equipment</class>
+    <class>ODB.Receptionist</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/gym_system?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
       <property name="javax.persistence.jdbc.user" value="root"/>

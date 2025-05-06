@@ -23,10 +23,9 @@ public class Package implements Serializable {
 
     @OneToMany 
     List<Trainee> traineeList;
+    
     public Package() {}
-
-    public Package(Long id, String Type, int Duration, float packageFee) {
-        this.id = id;
+    public Package(String Type, int Duration, float packageFee) {
         this.Type = Type;
         this.Duration = Duration;
         this.packageFee = packageFee;
@@ -40,33 +39,43 @@ public class Package implements Serializable {
         return id;
     }
 
-    public String getType() {
-        return Type;
-    }
-
-    public int getDuration() {
-        return Duration;
-    }
-
-    public float getPackageFee() {
-        return packageFee;
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getType() {
+        return Type;
     }
 
     public void setType(String Type) {
         this.Type = Type;
     }
 
+    public int getDuration() {
+        return Duration;
+    }
+
     public void setDuration(int Duration) {
         this.Duration = Duration;
+    }
+
+    public float getPackageFee() {
+        return packageFee;
     }
 
     public void setPackageFee(float packageFee) {
         this.packageFee = packageFee;
     }
+
+    public List<Trainee> getTraineeList() {
+        return traineeList;
+    }
+
+    public void setTraineeList(List<Trainee> traineeList) {
+        this.traineeList = traineeList;
+    }
+
+    
 
     @Override
     public String toString() {
