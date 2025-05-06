@@ -1,17 +1,22 @@
 package gymsystemmangement;
 
-
-
 import java.awt.*;
-import java.sql.*;
+import ODB.*;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import javax.swing.*;
 
 //import package Classes;
 public class Register extends javax.swing.JFrame {
+
     //public static ArrayList<Receptionist> receptionists = new ArrayList<>();
+    EntityManager em;
 
     public Register() {
         initComponents();
+        em = Persistence.createEntityManagerFactory("GymSystemMangementPU").createEntityManager();
         ImageIcon imageIcon = new ImageIcon("mainlogo.png");
         this.setIconImage(imageIcon.getImage());
         this.setLocationRelativeTo(null);
@@ -202,38 +207,36 @@ public class Register extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
+
         try {
-        String username = uname.getText().trim();
-        if (!username.matches("^[a-zA-Z\\s]+$")) {
-            JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        String password = pass.getText();
-        
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
-
-            String q = "INSERT INTO Receptionist (ReceptionistName,ReceptionistPassword) VALUES (?,?)";
-            PreparedStatement pst = con.prepareStatement(q);
-
-            pst.setString(1, username);
-            pst.setString(2, password);
-
-            int rowsInserted = pst.executeUpdate();
-
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Receptionist added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                new Home(username).setVisible(true);
-                this.dispose();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to add Receptionist.", "Error", JOptionPane.ERROR_MESSAGE);
-                uname.setText("");
-                pass.setText("");
+            String username = uname.getText().trim();
+            if (!username.matches("^[a-zA-Z\\s]+$")) {
+                JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
+            String password = pass.getText();
+
+            Receptionist receptionist = new Receptionist();
+            receptionist.setName(username);
+            receptionist.setPass(password);
+
+            em.getTransaction().begin();
+            em.persist(receptionist);
+            em.getTransaction().commit();
+
+            JOptionPane.showMessageDialog(null, "Receptionist added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            new Home(username).setVisible(true);
+            this.dispose();
 
         } catch (Exception e) {
-            System.out.println(e);
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("Error while adding receptionist: " + e.getMessage());
+            e.printStackTrace();
         }
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void unameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_unameFocusGained
