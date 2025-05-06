@@ -259,38 +259,36 @@ public class Home extends javax.swing.JFrame {
         }
     }
 
-private void loadTableDataEquipment() {
-    try {
-        List<Equipment> equipmentList = em.createQuery("SELECT e FROM Equipment e", Equipment.class).getResultList();
+    private void loadTableDataEquipment() {
+        try {
+            List<Equipment> equipmentList = em.createQuery("SELECT e FROM Equipment e", Equipment.class).getResultList();
 
-        DefaultTableModel model = (DefaultTableModel) mytable3.getModel();
-        model.setRowCount(0);
+            DefaultTableModel model = (DefaultTableModel) mytable3.getModel();
+            model.setRowCount(0);
 
-        for (Equipment e : equipmentList) {
-            Object[] row = {
-                e.getId(),
-                e.getEquipmentName(),
-                e.getTargetMuscle()
-            };
-            model.addRow(row);
+            for (Equipment e : equipmentList) {
+                Object[] row = {
+                    e.getId(),
+                    e.getEquipmentName(),
+                    e.getTargetMuscle()
+                };
+                model.addRow(row);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error loading table data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
-
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(null, "Error loading table data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
     }
-}
 
     private void loadTableDataReceptionist() {
         try {
 
             List<Receptionist> receptionists = em.createQuery("SELECT r FROM Receptionist r", Receptionist.class).getResultList();
 
- 
             DefaultTableModel model = (DefaultTableModel) mytable4.getModel();
             model.setRowCount(0);
 
-   
             for (Receptionist r : receptionists) {
                 Object[] row = {
                     r.getId(),
