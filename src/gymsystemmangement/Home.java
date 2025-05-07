@@ -1879,26 +1879,30 @@ public class Home extends javax.swing.JFrame {
             String phone = jTextField3.getText();
             String speciality = jComboBox2.getSelectedItem().toString();
 
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+            try {
+                em.getTransaction().begin();
+                
+                Trainer trainer = new Trainer();
+                trainer.setName(name);
+                trainer.setAge(age);
+                trainer.setPhone(phone);
+                trainer.setSalary(salary);
+                trainer.setSpeciality(speciality);
 
-            String q = "INSERT INTO Trainer (name,age,phone,salary,speciality) VALUES (?,?,?,?,?)";
-            PreparedStatement pst = con.prepareStatement(q);
+                em.persist(trainer);
+                em.getTransaction().commit();
 
-            pst.setString(1, name);
-            pst.setInt(2, age);
-            pst.setString(3, phone);
-            pst.setFloat(4, salary);
-            pst.setString(5, speciality);
-
-            int rowsInserted = pst.executeUpdate();
-
-            if (rowsInserted > 0) {
                 JOptionPane.showMessageDialog(null, "Trainer added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 loadTableDataTrainer();
                 LoadTrainersComboBox();
                 loadDashBord();
-            } else {
+
+            } catch (Exception e) {
+                em.getTransaction().rollback();
                 JOptionPane.showMessageDialog(null, "Failed to add Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            } finally {
+                em.close();
             }
 
             jButton8ActionPerformed(evt);
