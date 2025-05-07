@@ -1,0 +1,38 @@
+
+# === Build folders ===
+build/
+dist/
+nbbuild/
+nbdist/
+
+# === IDEs and editor settings ===
+*.iml
+.idea/
+*.ipr
+*.iws
+.vscode/
+nbproject/private/
+
+# === Java compiled files ===
+*.class
+*.jar
+*.war
+*.ear
+
+# === Logs and temporary files ===
+*.log
+*.tmp
+*.bak
+*~
+*.swp
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === Dependencies ===
+mysql-connector-j-9.3.0/
+
+# === Output images or unrelated binaries (optional, if auto-generated) ===
+mainlogo.png
+Logo1.png
