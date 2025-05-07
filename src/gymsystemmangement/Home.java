@@ -210,8 +210,8 @@ public class Home extends javax.swing.JFrame {
             DefaultTableModel model = (DefaultTableModel) mytable.getModel();
             model.setRowCount(0);
             List<Trainer> trainers = em.createQuery("SELECT t FROM Trainer t", Trainer.class).getResultList();
-            
-                for (Trainer t : trainers) {
+
+            for (Trainer t : trainers) {
                 Object[] row = {
                     t.getId(),
                     t.getName(),
@@ -229,25 +229,21 @@ public class Home extends javax.swing.JFrame {
 
     private void loadTableDataPackage() {
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
-
-            String q = "SELECT * FROM Package";
-
-            PreparedStatement pst = con.prepareStatement(q);
-            ResultSet rs = pst.executeQuery();
-
             DefaultTableModel model = (DefaultTableModel) mytable2.getModel();
             model.setRowCount(0);
-            
-            while (rs.next()) {
+
+            List<ODB.Package> packages = em.createQuery("SELECT p FROM Package p", ODB.Package.class).getResultList();
+
+            for (ODB.Package p : packages) {
                 Object[] row = {
-                    rs.getInt("PackageID"),
-                    rs.getString("Type"),
-                    rs.getInt("Duration"),
-                    rs.getFloat("packageFee")
+                    p.getId(),
+                    p.getType(),
+                    p.getDuration(),
+                    p.getPackageFee()
                 };
                 model.addRow(row);
             }
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error loading table data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
