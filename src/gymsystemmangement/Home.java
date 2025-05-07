@@ -1881,7 +1881,7 @@ public class Home extends javax.swing.JFrame {
 
             try {
                 em.getTransaction().begin();
-                
+
                 Trainer trainer = new Trainer();
                 trainer.setName(name);
                 trainer.setAge(age);
@@ -1945,27 +1945,33 @@ public class Home extends javax.swing.JFrame {
         String speciality = jComboBox2.getSelectedItem().toString();
         int id = Integer.parseInt(jLabel3.getText());
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
-            String q = "UPDATE Trainer "
-                    + "set name = (?),age = (?),phone = (?),salary = (?),speciality = (?)"
-                    + "where TrainerID = (?)";
-            PreparedStatement pst = con.prepareStatement(q);
+            try {
+                em.getTransaction().begin();
+                Trainer trainer = em.find(Trainer.class, id);
 
-            pst.setString(1, name);
-            pst.setInt(2, age);
-            pst.setString(3, phone);
-            pst.setFloat(4, salary);
-            pst.setString(5, speciality);
-            pst.setInt(6, id);
+                if (trainer != null) {
+                    trainer.setName(name);
+                    trainer.setAge(age);
+                    trainer.setPhone(phone);
+                    trainer.setSalary(salary);
+                    trainer.setSpeciality(speciality);
 
-            int rowsInserted = pst.executeUpdate();
+                    em.getTransaction().commit();
 
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Trainer Update successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadTableDataTrainer();
-                LoadTrainersComboBox();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to Update Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Trainer updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    loadTableDataTrainer();
+                    LoadTrainersComboBox();
+                } else {
+                    em.getTransaction().rollback();
+                    JOptionPane.showMessageDialog(null, "Trainer not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                jButton8ActionPerformed(evt);
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                JOptionPane.showMessageDialog(null, "Failed to update Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            } finally {
+                em.close();
             }
 
             //Reset
@@ -1987,21 +1993,32 @@ public class Home extends javax.swing.JFrame {
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
         int tid = Integer.parseInt(jLabel3.getText());
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+            try {
+                em.getTransaction().begin();
 
-            String q = "Delete from Trainer where TrainerID = (?)";
-            PreparedStatement pst = con.prepareStatement(q);
-            pst.setInt(1, tid);
-            int rowsInserted = pst.executeUpdate();
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Trainer Deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadTableDataTrainer();
-                LoadTrainersComboBox();
-                loadDashBord();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to Delete Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
+                Trainer trainer = em.find(Trainer.class, tid);
+
+                if (trainer != null) {
+                    em.remove(trainer);
+                    em.getTransaction().commit();
+
+                    JOptionPane.showMessageDialog(null, "Trainer deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    loadTableDataTrainer();
+                    LoadTrainersComboBox();
+                    loadDashBord();
+                } else {
+                    em.getTransaction().rollback();
+                    JOptionPane.showMessageDialog(null, "Trainer not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                jButton8ActionPerformed(evt);
+
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                JOptionPane.showMessageDialog(null, "Failed to delete Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            } finally {
+                em.close();
             }
-
             jButton8ActionPerformed(evt);
         } catch (Exception e) {
             System.out.println(e);
