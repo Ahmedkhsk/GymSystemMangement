@@ -2304,22 +2304,38 @@ public class Home extends javax.swing.JFrame {
                 return;
             }
 
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+            try {
 
-            String q = "INSERT INTO Package (Type,Duration,packageFee) VALUES (?,?,?)";
-            PreparedStatement pst = con.prepareStatement(q);
+                em.getTransaction().begin();
 
-            pst.setString(1, type);
-            pst.setInt(2, duration);
-            pst.setFloat(3, packageFee);
-            int rowsInserted = pst.executeUpdate();
+                ODB.Package pkg = new ODB.Package();
+                pkg.setType(type);
+                pkg.setDuration(duration);
+                pkg.setPackageFee(packageFee);
 
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Package added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                em.persist(pkg);
+
+                em.getTransaction().commit();
+
+                JOptionPane.showMessageDialog(this,
+                        "Package added successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
                 loadTableDataPackage();
                 LoadPackagesComboBox();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to add Package.", "Error", JOptionPane.ERROR_MESSAGE);
+
+            } catch (Exception e) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                JOptionPane.showMessageDialog(this,
+                        "Failed to add Package.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+
+            } finally {
+                em.close();
             }
             jButton17ActionPerformed(evt);
         } catch (Exception e) {
@@ -2362,25 +2378,43 @@ public class Home extends javax.swing.JFrame {
                 return;
             }
 
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+            try {
+                em.getTransaction().begin();
 
-            String q = "UPDATE Package "
-                    + "set type = (?),duration = (?),packageFee = (?)"
-                    + "where PackageID = (?)";
-            PreparedStatement pst = con.prepareStatement(q);
-            pst.setString(1, type);
-            pst.setInt(2, duration);
-            pst.setFloat(3, packageFee);
-            pst.setInt(4, id);
+                ODB.Package pkg = em.find(ODB.Package.class, id);  // id هو الـ PackageID
 
-            int rowsInserted = pst.executeUpdate();
+                if (pkg != null) {
+                    pkg.setType(type);
+                    pkg.setDuration(duration);
+                    pkg.setPackageFee(packageFee);
 
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Package Update successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadTableDataPackage();
-                LoadPackagesComboBox();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to Update Package.", "Error", JOptionPane.ERROR_MESSAGE);
+                    em.getTransaction().commit();
+
+                    JOptionPane.showMessageDialog(this,
+                            "Package updated successfully!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    loadTableDataPackage();
+                    LoadPackagesComboBox();
+                } else {
+                    em.getTransaction().rollback();
+                    JOptionPane.showMessageDialog(this,
+                            "Package not found.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
+            } catch (Exception e) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                JOptionPane.showMessageDialog(this,
+                        "Failed to update Package.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            } finally {
+                em.close();
             }
             jButton17ActionPerformed(evt);
         } catch (Exception e) {
@@ -2398,20 +2432,41 @@ public class Home extends javax.swing.JFrame {
     private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
         int pid = Integer.parseInt(jLabel41.getText());
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
+            try {
+                em.getTransaction().begin();
 
-            String q = "Delete from Package where PackageID = (?)";
-            PreparedStatement pst = con.prepareStatement(q);
-            pst.setInt(1, pid);
-            int rowsInserted = pst.executeUpdate();
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "PackageID Deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadTableDataPackage();
-                LoadPackagesComboBox();
-            } else {
-                JOptionPane.showMessageDialog(null, "Failed to Delete PackageID.", "Error", JOptionPane.ERROR_MESSAGE);
+                ODB.Package pkg = em.find(ODB.Package.class, pid);  // pid هو المعرف
+
+                if (pkg != null) {
+                    em.remove(pkg);
+                    em.getTransaction().commit();
+
+                    JOptionPane.showMessageDialog(this,
+                            "Package deleted successfully!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    loadTableDataPackage();
+                    LoadPackagesComboBox();
+                } else {
+                    em.getTransaction().rollback();
+                    JOptionPane.showMessageDialog(this,
+                            "Package not found.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
+            } catch (Exception e) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                JOptionPane.showMessageDialog(this,
+                        "Failed to delete Package.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            } finally {
+                em.close();
             }
-
             jButton17ActionPerformed(evt);
         } catch (Exception e) {
             System.out.println(e);
