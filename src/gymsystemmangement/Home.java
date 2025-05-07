@@ -207,24 +207,18 @@ public class Home extends javax.swing.JFrame {
 
     private void loadTableDataTrainer() {
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/GymSystem", "root", "");
-
-            String q = "SELECT * FROM Trainer ";
-
-            PreparedStatement pst = con.prepareStatement(q);
-            ResultSet rs = pst.executeQuery();
-
             DefaultTableModel model = (DefaultTableModel) mytable.getModel();
             model.setRowCount(0);
-
-            while (rs.next()) {
+            List<Trainer> trainers = em.createQuery("SELECT t FROM Trainer t", Trainer.class).getResultList();
+            
+                for (Trainer t : trainers) {
                 Object[] row = {
-                    rs.getInt("TrainerID"),
-                    rs.getString("name"),
-                    rs.getInt("age"),
-                    rs.getString("Speciality"),
-                    rs.getString("phone"),
-                    rs.getFloat("salary")
+                    t.getId(),
+                    t.getName(),
+                    t.getAge(),
+                    t.getSpeciality(),
+                    t.getPhone(),
+                    t.getSalary()
                 };
                 model.addRow(row);
             }
@@ -244,7 +238,7 @@ public class Home extends javax.swing.JFrame {
 
             DefaultTableModel model = (DefaultTableModel) mytable2.getModel();
             model.setRowCount(0);
-
+            
             while (rs.next()) {
                 Object[] row = {
                     rs.getInt("PackageID"),
