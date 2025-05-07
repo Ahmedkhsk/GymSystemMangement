@@ -1891,9 +1891,7 @@ public class Home extends javax.swing.JFrame {
                 em.getTransaction().rollback();
                 JOptionPane.showMessageDialog(null, "Failed to add Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
-            } finally {
-                em.close();
-            }
+            } 
 
             jButton8ActionPerformed(evt);
         } catch (Exception e) {
