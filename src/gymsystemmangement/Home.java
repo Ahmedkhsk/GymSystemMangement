@@ -1958,9 +1958,7 @@ public class Home extends javax.swing.JFrame {
                 em.getTransaction().rollback();
                 JOptionPane.showMessageDialog(null, "Failed to update Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
-            } finally {
-                em.close();
-            }
+            } 
 
             //Reset
             jButton8ActionPerformed(evt);
@@ -2004,9 +2002,7 @@ public class Home extends javax.swing.JFrame {
                 em.getTransaction().rollback();
                 JOptionPane.showMessageDialog(null, "Failed to delete Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
-            } finally {
-                em.close();
-            }
+            } 
             jButton8ActionPerformed(evt);
         } catch (Exception e) {
             System.out.println(e);
@@ -2322,8 +2318,6 @@ public class Home extends javax.swing.JFrame {
                         JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
 
-            } finally {
-                em.close();
             }
             jButton17ActionPerformed(evt);
         } catch (Exception e) {
@@ -2401,9 +2395,7 @@ public class Home extends javax.swing.JFrame {
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
-            } finally {
-                em.close();
-            }
+            } 
             jButton17ActionPerformed(evt);
         } catch (Exception e) {
             System.out.println(e);
@@ -2452,9 +2444,7 @@ public class Home extends javax.swing.JFrame {
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
-            } finally {
-                em.close();
-            }
+            } 
             jButton17ActionPerformed(evt);
         } catch (Exception e) {
             System.out.println(e);
