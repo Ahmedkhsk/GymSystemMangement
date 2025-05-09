@@ -20,40 +20,45 @@
 
 ## 🔍 Overview
 
-This Gym Management System is a comprehensive Java application designed for efficiently managing gym operations. The system provides an intuitive interface for administrators to manage members, subscriptions, trainers, schedules, equipment, and financial transactions in one centralized platform.
+This Gym Management System is a comprehensive Java-based desktop application designed for efficiently managing gym operations. The system provides an intuitive interface for administrators to manage gym members, subscriptions, trainers, schedules, equipment, and financial transactions in one centralized platform. Using JPA Code First methodology, the system ensures smooth integration with the MySQL database.
 
 ## ✨ Features
 
 ### 🔐 User Management
-- Secure login system for administrators and gym members
-- Registration system for new members
-- Multiple user permission levels
-- Password recovery options
+- Secure login system for administrators and gym members.
+- Registration system for new members.
+- Multiple user permission levels.
+- Password recovery options.
 
 ### 👥 Member Management
-- Track detailed member information and profiles
-- Manage membership types and subscription plans
-- Monitor attendance and gym usage patterns
-- Member progress tracking and fitness goals
+- Track detailed member information and profiles.
+- Manage membership types and subscription plans.
+- Monitor attendance and gym usage patterns.
+- Member progress tracking and fitness goals.
 
 ### 📊 Administrative Functions
-- Dashboard with key performance indicators
-- User role management
-- System settings and configuration
-- Customizable reporting tools
+- Dashboard with key performance indicators.
+- User role management for Receptionists (Admins).
+- System settings and configuration.
+- Customizable reporting tools.
 
 ### 💰 Payment Processing
-- Record payments and subscriptions
-- Generate invoices and payment reports
-- Track overdue payments
-- Support for various payment methods
+- Record payments and subscriptions.
+- Generate invoices and payment reports.
+- Track overdue payments.
+- Support for various payment methods.
 
-### 📅 Scheduling
-- Class and trainer scheduling
-- Equipment and facility booking
-- Appointment notifications and reminders
-- Capacity management
+### ⚙️ Equipment & Package Management
+- Manage gym equipment: track details like EquipmentID, name, targeted muscle group, and associated receptionist.
+- Define gym packages: manage package type, duration, fees, and the receptionist handling the package.
 
+### 💪 Trainee & Trainer Management
+- Manage trainees: track personal details, physical stats (weight, height), training goals, and package enrollment.
+- Manage trainers: record personal information, specialization, salary, and associated receptionist.
+
+### 🧑‍💼 Receptionist/Admin Role
+- Receptionists have full control over the system, managing all entities (Equipment, Packages, Trainees, Trainers).
+- The receptionist can handle CRUD operations for each entity and manage relationships between them.
 
 ## 💻 Technologies
 
@@ -83,37 +88,3 @@ This Gym Management System is a comprehensive Java application designed for effi
 1. Clone the repository:
    ```bash
    git clone https://github.com/Ahmedkhsk/GymSystemMangement.git
-   ```
-
-2. Open the project in NetBeans or your preferred Java IDE
-
-3. Set up the database:
-   - Create a new MySQL database
-   - Run the SQL scripts from the Database directory to set up tables and initial data
-
-4. Configure database connection:
-   - Update the database connection parameters in the configuration file
-
-5. Build and run the application
-
-
-## 👥 Contributing
-
-We welcome contributions to improve the Gym System Management project!
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Commit your changes: `git commit -m 'Add some feature'`
-4. Push to the branch: `git push origin feature-name`
-5. Submit a pull request
-
-Please make sure to update tests as appropriate and adhere to the existing coding style.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-<div align="center">
-  <p>Built with ❤️ by Ahmed</p>
-  <p>© 2024 Gym System Management</p>
-</div>
