@@ -1891,7 +1891,7 @@ public class Home extends javax.swing.JFrame {
                 em.getTransaction().rollback();
                 JOptionPane.showMessageDialog(null, "Failed to add Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
-            } 
+            }
 
             jButton8ActionPerformed(evt);
         } catch (Exception e) {
@@ -1931,7 +1931,7 @@ public class Home extends javax.swing.JFrame {
         }
         String phone = jTextField3.getText();
         String speciality = jComboBox2.getSelectedItem().toString();
-        int id = Integer.parseInt(jLabel3.getText());
+        Long id = Long.valueOf(jLabel3.getText());
         try {
             try {
                 em.getTransaction().begin();
@@ -1944,6 +1944,7 @@ public class Home extends javax.swing.JFrame {
                     trainer.setSalary(salary);
                     trainer.setSpeciality(speciality);
 
+                    em.merge(trainer);
                     em.getTransaction().commit();
 
                     JOptionPane.showMessageDialog(null, "Trainer updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -1958,7 +1959,7 @@ public class Home extends javax.swing.JFrame {
                 em.getTransaction().rollback();
                 JOptionPane.showMessageDialog(null, "Failed to update Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
-            } 
+            }
 
             //Reset
             jButton8ActionPerformed(evt);
@@ -1977,7 +1978,7 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        int tid = Integer.parseInt(jLabel3.getText());
+        Long tid = Long.valueOf(jLabel3.getText());
         try {
             try {
                 em.getTransaction().begin();
@@ -2002,7 +2003,7 @@ public class Home extends javax.swing.JFrame {
                 em.getTransaction().rollback();
                 JOptionPane.showMessageDialog(null, "Failed to delete Trainer.", "Error", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
-            } 
+            }
             jButton8ActionPerformed(evt);
         } catch (Exception e) {
             System.out.println(e);
@@ -2012,7 +2013,7 @@ public class Home extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 
         try {
-            int id = Integer.parseInt(jLabel39.getText());
+            Long id = Long.valueOf(jLabel39.getText());
 
             String name = jTextField5.getText().trim();
             if (!name.matches("^[a-zA-Z\\s]+$")) {
@@ -2058,8 +2059,8 @@ public class Home extends javax.swing.JFrame {
 
             String phone = jTextField7.getText();
             String goal = jTextArea2.getText();
-            int PID = jComboBox3.getSelectedIndex();
-            int TID = jComboBox4.getSelectedIndex();
+            Long PID = Long.valueOf(jComboBox3.getSelectedIndex());
+            Long TID = Long.valueOf(jComboBox4.getSelectedIndex());
 
             em.getTransaction().begin();
 
@@ -2097,109 +2098,132 @@ public class Home extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
+private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {
 
-        String name = jTextField5.getText().trim();
-        if (!name.matches("^[a-zA-Z\\s]+$")) {
-            JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+String name = jTextField5.getText().trim();
+if (!name.matches("^[a-zA-Z\\s]+$")) {
+    JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces"
+    , "Error"
+    , JOptionPane.ERROR_MESSAGE);
+    return;
+}
 
-        int age;
-        try {
-            age = Integer.parseInt(jTextField6.getText());
-            if (age <= 0) {
-                JOptionPane.showMessageDialog(null, "Age Must be More Than 0", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Invalid Age Input", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+int age;
+try {
+    age = Integer.parseInt(jTextField6.getText());
+    if (age <= 0) {
+        JOptionPane.showMessageDialog(null,
+         "Age Must be More Than 0",
+          "Error",
+          JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+} catch (NumberFormatException e) {
+    JOptionPane.showMessageDialog(null,
+     "Invalid Age Input",
+     "Error", 
+     JOptionPane.ERROR_MESSAGE);
+    return;
+}
 
-        float weight;
-        try {
-            weight = Float.parseFloat(jTextField8.getText());
-            if (weight <= 0) {
-                JOptionPane.showMessageDialog(null, "Weight Must be More Than 0", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Invalid Weight Input", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+float weight;
+try {
+    weight = Float.parseFloat(jTextField8.getText());
+    if (weight <= 0) {
+        JOptionPane.showMessageDialog(null,
+        "Weight Must be More Than 0",
+        "Error",
+        JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+} catch (NumberFormatException e) {
+    JOptionPane.showMessageDialog(null,
+    "Invalid Weight Input",
+    "Error",
+    JOptionPane.ERROR_MESSAGE);
+    return;
+}
 
-        float height;
-        try {
-            height = Float.parseFloat(jTextField9.getText());
-            if (height <= 0) {
-                JOptionPane.showMessageDialog(null, "Height Must be More Than 0", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Height Weight Input", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+float height;
+try {
+    height = Float.parseFloat(jTextField9.getText());
+    if (height <= 0) {
+        JOptionPane.showMessageDialog(null, 
+        "Height Must be More Than 0", 
+        "Error", 
+        JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+} catch (NumberFormatException e) {
+    JOptionPane.showMessageDialog(null, 
+    "Height Weight Input", 
+    "Error", 
+    JOptionPane.ERROR_MESSAGE);
+    return;
+}
 
-        String phone = jTextField7.getText();
-        String goal = jTextArea2.getText();
+String phone = jTextField7.getText();
+String goal = jTextArea2.getText();
 
-        int PID = jComboBox3.getSelectedIndex();
-        int TID = jComboBox4.getSelectedIndex();
+Long PID = Long.valueOf(jComboBox3.getSelectedIndex());
+Long TID = Long.valueOf(jComboBox4.getSelectedIndex());
 
-        Calendar startDate = Calendar.getInstance();
-        Calendar endDate = Calendar.getInstance();
+Calendar startDate = Calendar.getInstance();
+Calendar endDate = Calendar.getInstance();
 
-        ODB.Package selectedPackage = em.find(ODB.Package.class, PID);
-        ODB.Trainer selectedTrainer = em.find(ODB.Trainer.class, TID);
+ODB.Package selectedPackage = em.find(ODB.Package.class, PID);
+ODB.Trainer selectedTrainer = em.find(ODB.Trainer.class, TID);
 
-        if (selectedPackage == null || selectedTrainer == null) {
-            JOptionPane.showMessageDialog(null, "Invalid Package or Trainer selection.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+if (selectedPackage == null || selectedTrainer == null) {
+    JOptionPane.showMessageDialog(null, 
+    "Invalid Package or Trainer selection.", 
+    "Error", 
+    JOptionPane.ERROR_MESSAGE);
+    return;
+}
 
-        endDate.add(Calendar.MONTH, selectedPackage.getDuration());
+endDate.add(Calendar.MONTH, selectedPackage.getDuration());
 
-        String st;
-        String ed;
+String st;
+String ed;
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd");
-        st = sdf.format(startDate.getTime());
-        ed = sdf.format(endDate.getTime());
+SimpleDateFormat sdf = new SimpleDateFormat("MM/dd");
+st = sdf.format(startDate.getTime());
+ed = sdf.format(endDate.getTime());
 
-        try {
+try {
 
-            Trainee newTrainee = new Trainee(
-                    name,
-                    age,
-                    phone,
-                    weight,
-                    height,
-                    goal,
-                    st,
-                    ed,
-                    selectedTrainer,
-                    selectedPackage
-            );
+    Trainee newTrainee = new Trainee(
+    name,age,phone,weight
+    ,height,goal,st,ed,
+    selectedTrainer,selectedPackage
+    );
 
-            em.getTransaction().begin();
-            em.persist(newTrainee);
-            em.getTransaction().commit();
+    em.getTransaction().begin();
+    em.persist(newTrainee);
+    em.getTransaction().commit();
 
-            JOptionPane.showMessageDialog(null, "Trainee added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            loadTableDataTrainee();
-            loadDashBord();
-            jButton12ActionPerformed(evt);
+    JOptionPane.showMessageDialog(null, 
+    "Trainee added successfully!", 
+    "Success", 
+    JOptionPane.INFORMATION_MESSAGE);
+    loadTableDataTrainee();
+    loadDashBord();
+    jButton12ActionPerformed(evt);
 
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            JOptionPane.showMessageDialog(null, "Failed to add Trainee: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
+} catch (Exception e) {
+    if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+    }
+    JOptionPane.showMessageDialog(null, 
+    "Failed to add Trainee: " 
+    + e.getMessage(), 
+    "Error", 
+    JOptionPane.ERROR_MESSAGE);
+    e.printStackTrace();
+}
 
-    }//GEN-LAST:event_jButton11ActionPerformed
+}//GEN-LAST:event_jButton11ActionPerformed
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
         jLabel39.setText("00");
@@ -2213,8 +2237,8 @@ public class Home extends javax.swing.JFrame {
         jComboBox4.setSelectedIndex(0);
     }//GEN-LAST:event_jButton12ActionPerformed
 
-    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        int tid = Integer.parseInt(jLabel39.getText());
+    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {
+        Long tid = Long.valueOf(jLabel39.getText());
         try {
             em.getTransaction().begin();
 
@@ -2223,13 +2247,19 @@ public class Home extends javax.swing.JFrame {
                 em.remove(trainee);
                 em.getTransaction().commit();
 
-                JOptionPane.showMessageDialog(null, "Trainee deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, 
+                "Trainee deleted successfully!", 
+                "Success", 
+                JOptionPane.INFORMATION_MESSAGE);
                 loadTableDataTrainee();
                 loadDashBord();
                 jButton12ActionPerformed(evt);
             } else {
                 em.getTransaction().rollback();
-                JOptionPane.showMessageDialog(null, "Trainee not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, 
+                "Trainee not found.", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (Exception e) {
@@ -2329,7 +2359,8 @@ public class Home extends javax.swing.JFrame {
     private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
 
         try {
-            int id = Integer.parseInt(jLabel41.getText());
+            Long id = Long.valueOf(jLabel41.getText());
+
             String type = jTextField11.getText().trim();
             if (!type.matches("^[a-zA-Z\\s]+$")) {
                 JOptionPane.showMessageDialog(null, "Name must contain only letters and spaces", "Error", JOptionPane.ERROR_MESSAGE);
@@ -2340,7 +2371,7 @@ public class Home extends javax.swing.JFrame {
             try {
                 duration = Integer.parseInt(jTextField10.getText());
                 if (duration <= 0) {
-                    JOptionPane.showMessageDialog(null, "Duration Must be More Than 0", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Duration must be more than 0", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             } catch (NumberFormatException e) {
@@ -2352,54 +2383,43 @@ public class Home extends javax.swing.JFrame {
             try {
                 packageFee = Float.parseFloat(jTextField12.getText());
                 if (packageFee <= 0) {
-                    JOptionPane.showMessageDialog(null, "packageFee Must be More Than 0", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Package Fee must be more than 0", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Invalid packageFee Input", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Invalid Package Fee Input", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            try {
-                em.getTransaction().begin();
+            em.getTransaction().begin();
 
-                ODB.Package pkg = em.find(ODB.Package.class, id);  // id هو الـ PackageID
+            ODB.Package pkg = em.find(ODB.Package.class, id);
+            if (pkg == null) {
+                JOptionPane.showMessageDialog(null, "Package not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                em.getTransaction().rollback();
+                return;
+            }
 
-                if (pkg != null) {
-                    pkg.setType(type);
-                    pkg.setDuration(duration);
-                    pkg.setPackageFee(packageFee);
+            pkg.setType(type);
+            pkg.setDuration(duration);
+            pkg.setPackageFee(packageFee);
 
-                    em.getTransaction().commit();
+            em.merge(pkg);
+            em.getTransaction().commit();
 
-                    JOptionPane.showMessageDialog(this,
-                            "Package updated successfully!",
-                            "Success",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    loadTableDataPackage();
-                    LoadPackagesComboBox();
-                } else {
-                    em.getTransaction().rollback();
-                    JOptionPane.showMessageDialog(this,
-                            "Package not found.",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-
-            } catch (Exception e) {
-                if (em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                JOptionPane.showMessageDialog(this,
-                        "Failed to update Package.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
-            } 
+            JOptionPane.showMessageDialog(null, "Package updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadTableDataPackage();
+            LoadPackagesComboBox();
             jButton17ActionPerformed(evt);
+
         } catch (Exception e) {
-            System.out.println(e);
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("Update Error: " + e.getMessage());
+            e.printStackTrace();
         }
+
     }//GEN-LAST:event_jButton16ActionPerformed
 
     private void jButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton17ActionPerformed
@@ -2410,12 +2430,12 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton17ActionPerformed
 
     private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
-        int pid = Integer.parseInt(jLabel41.getText());
+        Long pid = Long.valueOf(jLabel41.getText());
         try {
             try {
                 em.getTransaction().begin();
 
-                ODB.Package pkg = em.find(ODB.Package.class, pid);  // pid هو المعرف
+                ODB.Package pkg = em.find(ODB.Package.class, pid);
 
                 if (pkg != null) {
                     em.remove(pkg);
@@ -2444,7 +2464,7 @@ public class Home extends javax.swing.JFrame {
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
-            } 
+            }
             jButton17ActionPerformed(evt);
         } catch (Exception e) {
             System.out.println(e);
@@ -2616,7 +2636,7 @@ public class Home extends javax.swing.JFrame {
 
     private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
         try {
-            int PID = Integer.parseInt(jLabel39.getText());
+            Long PID = Long.valueOf(jLabel39.getText());
 
             Calendar startDate = Calendar.getInstance();
             Calendar endDate = Calendar.getInstance();
